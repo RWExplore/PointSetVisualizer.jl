@@ -1,17 +1,6 @@
-# PointSetVisualizer.jl
-A dashboard that has two 2-D scatter plots. For visualizing higher-dimensional point sets.
+using Random, BenchmarkTools
 
-To navigate, use ctrl + left click to reset zoom.
-
-
-The z-coordinate of a mouse-over point is its data entry ID.
-
-Explicitly run `display(fig)` to display the dashboard, if working from the Julia REPL.
-
-## Example
-This eample is from `examples/demo.jl`. It generates points where each point is associated with one of three states (or classes). Each point has dimension `5`. Remember to run `display(fig)` to display the plot if you're running this code in a REPL.
-
-```{julia}
+using Revise
 import PointSetVisualizer as VZ
 
 const T = Float64
@@ -58,12 +47,5 @@ fig = VZ.create_dashboard(
 )
 
 display(fig)
-```
 
-# License
-This project is licensed under the GNU Affero General Public License v3.0 license; see the `LICENSE` file for details. Individual source files may contain the following tag instead of the full license text:
-```
-SPDX-License-Identifier: AGPL-3.0-only
-```
-
-Using SPDX enables machine processing of license information based on the SPDX License Identifiers and makes it easier for developers to see at a glance which license they are dealing with.
+nothing
