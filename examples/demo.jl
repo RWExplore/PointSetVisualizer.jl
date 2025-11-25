@@ -28,10 +28,16 @@ function generate_col_IDs(rng::AbstractRNG, ::Type{T}, num_states::Integer, N::I
         )
     end
 
-    return state_list, col_IDs
+    pt_annotations = Vector{Vector{String}}(undef, length(col_IDs))
+    for k in eachindex(pt_annotations, col_IDs)
+
+        pt_annotations[k] = map(xx -> "id: $(xx)", col_IDs[k])
+    end
+
+    return state_list, col_IDs, pt_annotations
 end
 num_pts = 1000
-state_list, col_IDs = generate_col_IDs(rng, T, num_states, num_pts)
+state_list, col_IDs, pt_annotations = generate_col_IDs(rng, T, num_states, num_pts)
 data_set = collect(randn(rng, T, D, length(x)) .+ (10 * randn(rng, T)) for x in col_IDs)
 
 title_strings = ["Plot 1"; "Plot 2"]
@@ -40,12 +46,14 @@ fig = VZ.create_dashboard(
     state_labels,
     state_colors,
     row_labels,
-    col_IDs,
+    pt_annotations,
     data_set,
     title_strings;
     state_markers = state_markers,
 )
 
 display(fig)
+
+# col_IDs[k] contains the global point ID for each column of data_set[k]
 
 nothing

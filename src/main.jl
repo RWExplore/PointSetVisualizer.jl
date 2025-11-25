@@ -6,7 +6,7 @@
         state_labels::AbstractVector{<:AbstractString},
         state_colors::AbstractVector,
         row_labels::AbstractVector{<:AbstractString},
-        col_IDs::AbstractVector{<:AbstractVector{<:Integer}},
+        pt_annotations::AbstractVector{<:AbstractVector{<:AbstractString}},
         data_set::AbstractVector{<:AbstractMatrix{<:Real}},
         titles::AbstractVector{<:AbstractString};
         state_markers::Vector{Symbol} = collect(:circle for _ in 1:length(state_colors)),
@@ -22,7 +22,7 @@ inputs:
 
 `data_set` contains the point set to be visualized. It is a length `K` array of matrices. `data_set[k]` is a matrix that contains all the points that are associated with state `k`. `data_set[k][d,n]` is the `d`-th coordinate of the `n`-th point in the points associated with state `k`.
 
-`col_IDs` correspond to an integer ID for each column of the matrices in `data_set`. It is a length `K` array of arrays. This must be true for the inputs to be valid: `size(data_set[k], 2) == length(col_IDs[k])`.
+`pt_annotations` correspond to an string annotation for each column of the matrices in `data_set`. It is a length `K` array of arrays. This must be true for the inputs to be valid: `size(data_set[k], 2) == length(pt_annotations[k])`.
 
 `state_labels` is a length `K` array that contain the state description. Appears in the legend of the scatter plots.
 
@@ -45,7 +45,7 @@ function create_dashboard(
         state_labels::AbstractVector{<:AbstractString},
         state_colors::AbstractVector,
         row_labels::AbstractVector{<:AbstractString},
-        col_IDs::AbstractVector{<:AbstractVector{<:Integer}},
+        pt_annotations::AbstractVector{<:AbstractVector{<:AbstractString}},
         data_set::AbstractVector{<:AbstractMatrix{<:Real}},
         titles::AbstractVector{<:AbstractString};
         state_markers::Vector{Symbol} = collect(:circle for _ in 1:length(state_colors)),
@@ -57,13 +57,13 @@ function create_dashboard(
     length(titles) == num_plots || error("The title string should have two entries.")
 
     length(state_labels) == length(state_colors) || error("Length mismatch.")
-    length(col_IDs) == length(data_set) || error("Length mismatch.")
+    length(pt_annotations) == length(data_set) || error("Length mismatch.")
 
     length(row_labels) > 1 || error("row_labels must be at least 2. This package is for visualizing points that have dimension of at least 2.")
 
     for k in eachindex(data_set)
         length(row_labels) == size(data_set[k], 1) || error("Size mismatch.")
-        length(col_IDs[k]) == size(data_set[k], 2) || error("Size mismatch.")
+        length(pt_annotations[k]) == size(data_set[k], 2) || error("Size mismatch.")
     end
 
     # # Setup figure
@@ -114,7 +114,7 @@ function create_dashboard(
             state_colors::AbstractVector,
             state_markers::AbstractVector{<:Symbol},
             row_labels::AbstractVector{<:AbstractString},
-            col_IDs::AbstractVector{<:AbstractVector{<:Integer}},
+            pt_annotations::AbstractVector{<:AbstractVector{<:AbstractString}},
             data_set::AbstractVector{<:AbstractMatrix{<:Real}},
             titles::AbstractVector{<:AbstractString},
         )
@@ -137,7 +137,7 @@ function create_dashboard(
 
             ax_plots[i].title[] = titles[i]
 
-            for k in eachindex(data_set, state_colors, state_labels, col_IDs, state_markers)
+            for k in eachindex(data_set, state_colors, state_labels, pt_annotations, state_markers)
 
                 ax_plots[i].xlabel[] = x_label
                 ax_plots[i].ylabel[] = y_label
@@ -146,10 +146,11 @@ function create_dashboard(
                     ax_plots[i],
                     view(data_set[k], r1, :),
                     view(data_set[k], r2, :),
-                    col_IDs[k],
+                    #col_IDs[k],
                     color = state_colors[k],
                     label = state_labels[k],
-                    marker = state_markers[k]
+                    marker = state_markers[k],
+                    inspector_label = (self, l, pos) -> "($(pos[1]), $(pos[2])), $(pt_annotations[k][l])"
                 )
             end
             axislegend(ax_plots[i], position = :rb)
@@ -171,7 +172,7 @@ function create_dashboard(
                 state_colors,
                 state_markers,
                 row_labels,
-                col_IDs,
+                pt_annotations,
                 data_set,
                 titles,
             )
@@ -181,6 +182,3 @@ function create_dashboard(
 
     return fig
 end
-
-
-nothing
